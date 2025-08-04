@@ -1,0 +1,193 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Organization model
+model Organization {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  contractType    ContractType @default(PROFESSIONAL)
+  
+  // Settings
+  logoUrl         String?
+  primaryColor    String    @default("#1e40af")
+  supportEmail    String?
+  
+  // SSO Configuration
+  ssoEnabled      Boolean   @default(false)
+  ssoProvider     String?   // SAML, OIDC, etc.
+  ssoConfig       Json?     // Provider-specific config
+  
+  // Limits
+  maxUsers        Int       @default(50)
+  maxRequestsPerMonth Int   @default(500000)
+  
+  // Relations
+  users           User[]
+  usageLogs       UsageLog[]
+  settings        OrganizationSettings?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// Organization Settings (1:1)
+model OrganizationSettings {
+  id              String    @id @default(cuid())
+  orgId           String    @unique
+  organization    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  
+  // Available features
+  availableDocuments String[] @default(["crr", "kwg", "marisk"])
+  availableLanguages String[] @default(["de", "en"])
+  
+  // Default limits
+  defaultDailyLimit Int      @default(200)
+  defaultMonthlyLimit Int    @default(5000)
+  
+  // Behavior settings
+  limitBehavior   LimitBehavior @default(BLOCK)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// User model
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String?
+  role            UserRole  @default(USER)
+  
+  // Organization
+  orgId           String
+  organization    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  
+  // Auth
+  emailVerified   DateTime?
+  image           String?
+  ssoId           String?   // SSO provider user ID
+  
+  // Status
+  isActive        Boolean   @default(true)
+  lastLogin       DateTime?
+  
+  // Relations
+  sessions        Session[]
+  chats           Chat[]
+  usageLogs       UsageLog[]
+  userLimits      UserLimits?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([orgId])
+  @@index([email])
+}
+
+// User Limits (1:1 with User)
+model UserLimits {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  dailyLimit      Int?      // null = use org default
+  monthlyLimit    Int?      // null = use org default
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// Session model (for NextAuth)
+model Session {
+  id              String    @id @default(cuid())
+  sessionToken    String    @unique
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires         DateTime
+  
+  @@index([userId])
+}
+
+// Chat model
+model Chat {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title           String?
+  messages        ChatMessage[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([userId])
+}
+
+// Chat Message model
+model ChatMessage {
+  id              String    @id @default(cuid())
+  chatId          String
+  chat            Chat      @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  
+  role            MessageRole
+  content         String    @db.Text
+  sources         Json?     // Array of sources with page numbers
+  tokensUsed      Int?
+  
+  createdAt       DateTime  @default(now())
+  
+  @@index([chatId])
+}
+
+// Usage tracking
+model UsageLog {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orgId           String
+  organization    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  
+  action          String    // chat.query, document.view, etc.
+  tokensUsed      Int       @default(0)
+  endpoint        String?
+  metadata        Json?
+  
+  createdAt       DateTime  @default(now())
+  
+  @@index([userId, createdAt])
+  @@index([orgId, createdAt])
+}
+
+// Enums
+enum ContractType {
+  PROFESSIONAL
+  ENTERPRISE
+  ENTERPRISE_PLUS
+}
+
+enum UserRole {
+  SUPER_ADMIN  // System admin (you)
+  ADMIN        // Organization admin
+  USER         // Regular user
+}
+
+enum LimitBehavior {
+  WARN         // Show warning but allow
+  BLOCK        // Hard block
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
