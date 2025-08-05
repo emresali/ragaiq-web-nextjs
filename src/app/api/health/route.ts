@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db/prisma"
 export async function GET() {
   try {
     // Check database connection
-    await prisma.$queryRaw`SELECT 1`
+    await prisma.$queryRaw`SELECT 1 as result`
     
     // Check environment variables
     const requiredEnvVars = [

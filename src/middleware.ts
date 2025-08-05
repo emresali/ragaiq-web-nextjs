@@ -1,28 +1,40 @@
 // src/middleware.ts
-import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
+import { getToken } from "next-auth/jwt"
 
-export default withAuth(
-  function middleware() {
-    // Zusätzliche Middleware-Logik hier
-    return NextResponse.next()
-  },
-  {
-    callbacks: {
-      authorized: ({ req, token }) => {
-        // Prüfe ob User eingeloggt ist
-        if (req.nextUrl.pathname.startsWith("/dashboard")) {
-          return token !== null
-        }
-        // Prüfe Admin-Bereiche
-        if (req.nextUrl.pathname.startsWith("/admin")) {
-          return token?.role === "ADMIN" || token?.role === "SUPER_ADMIN"
-        }
-        return true
-      },
-    },
+export async function middleware(request: NextRequest) {
+  const token = await getToken({ req: request })
+  const { pathname } = request.nextUrl
+
+  // Protect dashboard routes
+  if (pathname.startsWith("/dashboard")) {
+    if (!token) {
+      const loginUrl = new URL("/login", request.url)
+      loginUrl.searchParams.set("callbackUrl", pathname)
+      return NextResponse.redirect(loginUrl)
+    }
   }
-)
+
+  // Protect admin routes
+  if (pathname.startsWith("/admin")) {
+    if (!token || (token.role !== "ADMIN" && token.role !== "SUPER_ADMIN")) {
+      return NextResponse.redirect(new URL("/dashboard", request.url))
+    }
+  }
+
+  // Protect API routes
+  if (pathname.startsWith("/api/protected")) {
+    if (!token) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      )
+    }
+  }
+
+  return NextResponse.next()
+}
 
 export const config = {
   matcher: [
