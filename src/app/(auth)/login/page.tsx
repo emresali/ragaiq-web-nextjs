@@ -1,56 +1,46 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { useFormState, useFormStatus } from "react-dom"
 import { Loader2, Shield, Zap, BookOpen, Building2, Lock, AlertCircle } from "lucide-react"
 import Link from "next/link"
+import { authenticate } from "./actions"
+
+function LoginButton() {
+  const { pending } = useFormStatus()
+  
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="w-full bg-ragaiq-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-ragaiq-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ragaiq-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+    >
+      {pending ? (
+        <span className="flex items-center justify-center">
+          <Loader2 className="animate-spin h-5 w-5 mr-2" />
+          Wird überprüft...
+        </span>
+      ) : (
+        "Anmelden"
+      )}
+    </button>
+  )
+}
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [errorMessage, dispatch] = useFormState(authenticate, undefined)
+  const [ssoLoading, setSsoLoading] = useState(false)
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setIsLoading(true)
-    setError(null)
 
-    const formData = new FormData(event.currentTarget)
-    const email = formData.get("email") as string
-    const password = formData.get("password") as string
-
-    try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      })
-
-      if (result?.error) {
-        setError("Ungültige Anmeldedaten oder Ihr Konto ist noch nicht aktiviert.")
-        return
-      }
-
-      router.push("/dashboard")
-      router.refresh()
-    } catch {
-      setError("Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.")
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   const handleSSO = async (provider: string) => {
-    setIsLoading(true)
-    setError(null)
+    setSsoLoading(true)
     
     try {
       // In production, this would redirect to SSO provider
-      await signIn(provider, { callbackUrl: "/dashboard" })
+      window.location.href = `/api/auth/signin/${provider}`
     } catch {
-      setError("SSO-Anmeldung fehlgeschlagen")
-      setIsLoading(false)
+      setSsoLoading(false)
     }
   }
 
@@ -89,14 +79,14 @@ export default function LoginPage() {
               </span>
             </div>
 
-            {error && (
+            {errorMessage && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
                 <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-700">{error}</p>
+                <p className="text-sm text-red-700">{errorMessage}</p>
               </div>
             )}
 
-            <form onSubmit={onSubmit} className="space-y-5">
+            <form action={dispatch} className="space-y-5">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                   Geschäftliche E-Mail-Adresse
@@ -127,20 +117,7 @@ export default function LoginPage() {
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-ragaiq-primary text-white py-3 px-4 rounded-lg font-medium hover:bg-ragaiq-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ragaiq-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-              >
-                {isLoading ? (
-                  <span className="flex items-center justify-center">
-                    <Loader2 className="animate-spin h-5 w-5 mr-2" />
-                    Wird überprüft...
-                  </span>
-                ) : (
-                  "Anmelden"
-                )}
-              </button>
+              <LoginButton />
             </form>
 
             {/* Divider */}
@@ -157,7 +134,7 @@ export default function LoginPage() {
             <div className="space-y-3">
               <button
                 onClick={() => handleSSO("saml")}
-                disabled={isLoading}
+                disabled={ssoLoading}
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Lock className="w-5 h-5 text-gray-600" />

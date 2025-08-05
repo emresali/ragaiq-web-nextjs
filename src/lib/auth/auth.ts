@@ -1,10 +1,9 @@
 // src/lib/auth/auth.ts
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "./auth.config"
+import { auth } from "./auth.config"
 import { redirect } from "next/navigation"
 
 export async function getSession() {
-  return await getServerSession(authOptions)
+  return await auth()
 }
 
 export async function getCurrentUser() {

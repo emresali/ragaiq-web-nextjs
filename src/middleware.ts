@@ -1,10 +1,11 @@
 // src/middleware.ts
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { getToken } from "next-auth/jwt"
+import { auth } from "@/lib/auth/auth.config"
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request })
+  const session = await auth()
+  const token = session?.user
   const { pathname } = request.nextUrl
 
   // Protect dashboard routes
