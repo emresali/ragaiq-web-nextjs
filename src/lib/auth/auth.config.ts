@@ -1,9 +1,12 @@
+// src/lib/auth/auth.config.ts
 import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/db/prisma"
 import bcrypt from "bcryptjs"
-import { UserRole } from "@/types"
+
+// Type definitions
+export type UserRole = "SUPER_ADMIN" | "ADMIN" | "USER"
 
 declare module "next-auth" {
   interface Session {
@@ -51,49 +54,46 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid credentials")
+          return null
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-          include: {
-            organization: true,
-          },
-        })
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+            include: {
+              organization: true,
+            },
+          })
 
-        if (!user || !user.isActive) {
-          throw new Error("User not found or inactive")
-        }
+          if (!user || !user.isActive) {
+            return null
+          }
 
-        // For MVP, we'll store passwords (in production, use SSO)
-        // const isPasswordValid = await bcrypt.compare(
-        //   credentials.password,
-        //   user.password
-        // )
+          // For MVP, simple password check (replace with real implementation)
+          if (credentials.password !== "demo123") {
+            return null
+          }
 
-        // For now, simple password check (replace with real implementation)
-        if (credentials.password !== "demo123") {
-          throw new Error("Invalid password")
-        }
+          // Update last login
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { lastLogin: new Date() },
+          })
 
-        // Update last login
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { lastLogin: new Date() },
-        })
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role as UserRole,
-          orgId: user.orgId,
-          organizationName: user.organization.name,
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role as UserRole,
+            orgId: user.orgId,
+            organizationName: user.organization.name,
+          }
+        } catch (error) {
+          console.error("Auth error:", error)
+          return null
         }
       },
     }),
-    // SSO providers will be added here later
-    // SAMLProvider({...}),
   ],
   callbacks: {
     async jwt({ token, user }) {
@@ -107,10 +107,10 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id
-        session.user.role = token.role
-        session.user.orgId = token.orgId
-        session.user.organizationName = token.organizationName
+        session.user.id = token.id as string
+        session.user.role = token.role as UserRole
+        session.user.orgId = token.orgId as string
+        session.user.organizationName = token.organizationName as string
       }
       return session
     },
