@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/db/prisma"
 import bcrypt from "bcryptjs"
+import { Adapter } from "next-auth/adapters"
 
 // Type definitions
 export type UserRole = "SUPER_ADMIN" | "ADMIN" | "USER"
@@ -40,13 +41,15 @@ declare module "next-auth/jwt" {
 }
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as any,
+  // Wichtig: Cast zu Adapter für TypeScript
+  adapter: PrismaAdapter(prisma) as Adapter,
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   providers: [
     CredentialsProvider({
+      id: "credentials",
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
@@ -54,24 +57,33 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null
+          throw new Error("Email und Passwort sind erforderlich")
         }
 
         try {
           const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
+            where: { 
+              email: credentials.email.toLowerCase() // Normalisiere Email
+            },
             include: {
               organization: true,
             },
           })
 
-          if (!user || !user.isActive) {
-            return null
+          if (!user) {
+            throw new Error("Ungültige Anmeldedaten")
           }
 
-          // For MVP, simple password check (replace with real implementation)
-          if (credentials.password !== "demo123") {
-            return null
+          if (!user.isActive) {
+            throw new Error("Ihr Konto ist deaktiviert")
+          }
+
+          // Für MVP: Einfache Passwort-Überprüfung
+          // TODO: Später mit bcrypt hashen
+          const isValidPassword = credentials.password === "demo123"
+          
+          if (!isValidPassword) {
+            throw new Error("Ungültige Anmeldedaten")
           }
 
           // Update last login
@@ -90,34 +102,57 @@ export const authOptions: NextAuthOptions = {
           }
         } catch (error) {
           console.error("Auth error:", error)
-          return null
+          // Wirf den Fehler weiter für besseres Error Handling
+          if (error instanceof Error) {
+            throw error
+          }
+          throw new Error("Authentifizierung fehlgeschlagen")
         }
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      // Bei initialer Anmeldung
       if (user) {
         token.id = user.id
+        token.email = user.email
+        token.name = user.name
         token.role = user.role
         token.orgId = user.orgId
         token.organizationName = user.organizationName
       }
+
+      // Bei Session Update
+      if (trigger === "update" && session) {
+        token = { ...token, ...session }
+      }
+
       return token
     },
     async session({ session, token }) {
-      if (session.user) {
+      if (token && session.user) {
         session.user.id = token.id as string
+        session.user.email = token.email as string
+        session.user.name = token.name as string | null
         session.user.role = token.role as UserRole
         session.user.orgId = token.orgId as string
         session.user.organizationName = token.organizationName as string
       }
       return session
     },
+    async redirect({ url, baseUrl }) {
+      // Verhindere Redirects zu externen URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      else if (new URL(url).origin === baseUrl) return url
+      return baseUrl
+    },
   },
   pages: {
     signIn: "/login",
-    error: "/login",
+    error: "/login", // Redirect zu Login bei Fehler
+    signOut: "/login",
   },
+  secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
 }
