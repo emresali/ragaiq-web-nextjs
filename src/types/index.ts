@@ -1,4 +1,6 @@
 // src/types/index.ts
+import { JsonValue } from "@prisma/client/runtime/library"
+
 export type UserRole = "SUPER_ADMIN" | "ADMIN" | "USER"
 
 export type ContractType = "PROFESSIONAL" | "ENTERPRISE" | "ENTERPRISE_PLUS"
@@ -15,7 +17,7 @@ export interface Organization {
   supportEmail?: string
   ssoEnabled: boolean
   ssoProvider?: string
-  ssoConfig?: any
+  ssoConfig?: JsonValue
   maxUsers: number
   maxRequestsPerMonth: number
   createdAt: Date

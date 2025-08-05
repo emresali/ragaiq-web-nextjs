@@ -1,4 +1,3 @@
-// src/app/(auth)/login/page.tsx
 "use client"
 
 import { useState } from "react"
@@ -11,7 +10,6 @@ export default function LoginPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [authMethod, setAuthMethod] = useState<"credentials" | "sso">("credentials")
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -36,7 +34,7 @@ export default function LoginPage() {
 
       router.push("/dashboard")
       router.refresh()
-    } catch (error) {
+    } catch {
       setError("Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.")
     } finally {
       setIsLoading(false)
@@ -50,7 +48,7 @@ export default function LoginPage() {
     try {
       // In production, this would redirect to SSO provider
       await signIn(provider, { callbackUrl: "/dashboard" })
-    } catch (error) {
+    } catch {
       setError("SSO-Anmeldung fehlgeschlagen")
       setIsLoading(false)
     }
@@ -232,7 +230,7 @@ export default function LoginPage() {
                 <BookOpen className="w-6 h-6 text-ragaiq-primary" />
               </div>
               <div>
-                <h3 className="text-xl font-semibold mb-2 text-white">KWG, MaRisk & CRR Expertise</h3>
+                <h3 className="text-xl font-semibold mb-2 text-white">KWG, MaRisk &amp; CRR Expertise</h3>
                 <p className="text-gray-300 leading-relaxed">
                   Direkter Zugriff auf regulatorische Dokumente mit KI-gestützter Analyse
                 </p>
@@ -271,7 +269,7 @@ export default function LoginPage() {
                 <span className="text-xl">→</span> Frage:
               </div>
               <div className="text-white font-medium mb-4 pl-6">
-                "Welche Anforderungen stellt MaRisk an das Risikocontrolling?"
+                &ldquo;Welche Anforderungen stellt MaRisk an das Risikocontrolling?&rdquo;
               </div>
               <div className="text-ragaiq-primary mb-2 flex items-center gap-2">
                 <span className="text-xl">←</span> RagAI-Q:
