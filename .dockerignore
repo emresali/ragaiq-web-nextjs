@@ -12,6 +12,12 @@ node_modules
 # Testing
 coverage
 .nyc_output
+**/__tests__
+**/__mocks__
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
 
 # Next.js
 .next
@@ -21,17 +27,17 @@ out
 build
 dist
 
-# Misc
-.DS_Store
-*.pem
+# Environment Variables
 .env*
 !.env.example
+!.env.production
 
 # Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+lerna-debug.log*
 
 # Vercel
 .vercel
@@ -44,16 +50,20 @@ next-env.d.ts
 .git
 .gitignore
 .gitattributes
+.husky
 
 # Documentation
 README.md
 docs
 *.md
+!CHANGELOG.md
 
 # CI/CD
 .github
 .gitlab-ci.yml
 .travis.yml
+.circleci
+Jenkinsfile
 
 # IDE
 .vscode
@@ -61,14 +71,50 @@ docs
 *.swp
 *.swo
 *~
+*.sublime-*
+.project
+.classpath
+.c9/
 
 # OS
+.DS_Store
 Thumbs.db
+desktop.ini
 
-# Tests
-__tests__
-__mocks__
-*.test.ts
-*.test.tsx
-*.spec.ts
-*.spec.tsx
+# Package Manager
+pnpm-lock.yaml
+yarn.lock
+!package-lock.json
+
+# Development
+.eslintcache
+.cache
+.parcel-cache
+.turbo
+
+# Temporary files
+tmp
+temp
+*.tmp
+*.temp
+*.log
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Miscellaneous
+*.pem
+*.key
+*.cert
+*.crt
+.maintenance
+robots.txt
+
+# Storybook (falls verwendet)
+storybook-static
+.storybook
+
+# Public folder items (selektiv)
+# public/mockServiceWorker.js
