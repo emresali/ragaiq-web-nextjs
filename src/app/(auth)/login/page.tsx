@@ -143,7 +143,7 @@ export default function LoginPage() {
 
               <button
                 onClick={() => handleSSO("azure")}
-                disabled={isLoading}
+                disabled={ssoLoading}
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Building2 className="w-5 h-5 text-blue-600" />
