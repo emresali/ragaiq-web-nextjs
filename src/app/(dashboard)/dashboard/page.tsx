@@ -12,7 +12,8 @@ import {
   Stack,
   Chip,
   Button,
-  IconButton
+  IconButton,
+  Divider
 } from '@mui/material'
 import {
   TrendingUp,
