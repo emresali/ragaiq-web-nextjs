@@ -1,101 +1,35 @@
-@import "tailwindcss";
+/* src/app/globals.css */
+/* Minimal CSS - MUI handles most styling */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  
-  /* RagAI-Q Brand Colors */
   --ragaiq-primary: #5ce1e6;
-  --ragaiq-dark: #0a0a0a;
-  --ragaiq-light: #f9fafb;
-  
-  /* Component colors */
-  --border: #e5e7eb;
-  --input: #e5e7eb;
-  --ring: #5ce1e6;
-  --muted: #6b7280;
-  --muted-foreground: #9ca3af;
-  --accent: #f3f4f6;
-  --accent-foreground: #111827;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-ragaiq-primary: var(--ragaiq-primary);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
 }
 
-/* Custom utility classes */
-.text-ragaiq-primary {
-  color: var(--ragaiq-primary);
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-.bg-ragaiq-primary {
-  background-color: var(--ragaiq-primary);
-}
-
-.border-ragaiq-primary {
-  border-color: var(--ragaiq-primary);
-}
-
-.ring-ragaiq-primary {
-  --tw-ring-color: var(--ragaiq-primary);
-}
-
-/* Beautiful gradient background for auth pages */
-.auth-gradient {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 25%, #bae6fd 50%, #7dd3fc 75%, #5ce1e6 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.auth-gradient::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(92, 225, 230, 0.1) 0%, transparent 70%);
-  animation: float 20s ease-in-out infinite;
-}
-
-.auth-gradient::after {
-  content: '';
-  position: absolute;
-  bottom: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(125, 211, 252, 0.1) 0%, transparent 70%);
-  animation: float 25s ease-in-out infinite reverse;
-}
-
-@keyframes float {
+@keyframes pulse {
   0%, 100% {
-    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
   }
-  33% {
-    transform: translate(30px, -30px) rotate(120deg);
+  50% {
+    opacity: .5;
   }
-  66% {
-    transform: translate(-20px, 20px) rotate(240deg);
-  }
-}
-
-/* Glass effect for cards */
-.glass-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(92, 225, 230, 0.15);
 }

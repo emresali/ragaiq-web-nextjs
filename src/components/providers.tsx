@@ -1,7 +1,11 @@
+// src/components/providers.tsx
 "use client"
 
 import { SessionProvider } from "next-auth/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { ThemeProvider } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+import { theme } from '@/lib/theme/theme'
 import { useState } from "react"
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -20,7 +24,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
       <QueryClientProvider client={queryClient}>
-        {children}
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          {children}
+        </ThemeProvider>
       </QueryClientProvider>
     </SessionProvider>
   )
