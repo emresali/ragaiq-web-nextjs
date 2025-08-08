@@ -3,7 +3,7 @@
 
 import { 
   Box, 
-  Grid2 as Grid,
+  Grid2 as Grid,  // Grid2 importieren
   Paper, 
   Typography, 
   Card,
@@ -83,7 +83,6 @@ export default function DashboardPage() {
         Dashboard
       </Typography>
 
-      {/* Stats Grid */}
       <Grid container spacing={3} mb={4}>
         {stats.map((stat) => {
           const Icon = stat.icon
@@ -125,7 +124,6 @@ export default function DashboardPage() {
       </Grid>
 
       <Grid container spacing={3}>
-        {/* Recent Queries */}
         <Grid size={{ xs: 12, lg: 8 }}>
           <Paper sx={{ p: 3 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -175,7 +173,6 @@ export default function DashboardPage() {
           </Paper>
         </Grid>
 
-        {/* Usage Overview */}
         <Grid size={{ xs: 12, lg: 4 }}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" fontWeight="bold" mb={3}>

@@ -1,11 +1,8 @@
-// prisma/seed.ts
 import { PrismaClient } from "@prisma/client"
-import bcrypt from "bcryptjs"
 
 const prisma = new PrismaClient()
 
 async function main() {
-  // Erstelle Test-Organisation
   const org = await prisma.organization.upsert({
     where: { slug: "demo-corp" },
     update: {},
@@ -20,7 +17,6 @@ async function main() {
     },
   })
 
-  // Erstelle Organization Settings
   await prisma.organizationSettings.upsert({
     where: { orgId: org.id },
     update: {},
@@ -34,7 +30,6 @@ async function main() {
     },
   })
 
-  // Erstelle Test-User
   const user = await prisma.user.upsert({
     where: { email: "demo@demo-corp.com" },
     update: {},
@@ -48,7 +43,6 @@ async function main() {
     },
   })
 
-  // Erstelle User Limits
   await prisma.userLimits.upsert({
     where: { userId: user.id },
     update: {},
@@ -58,10 +52,6 @@ async function main() {
       monthlyLimit: 20000,
     },
   })
-
-  console.log("✅ Seed data created successfully")
-  console.log("📧 Test User: demo@demo-corp.com")
-  console.log("🔑 Password: demo123")
 }
 
 main()

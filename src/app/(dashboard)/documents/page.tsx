@@ -4,7 +4,7 @@
 import { useState } from 'react'
 import {
   Box,
-  Grid,
+  Grid2 as Grid,  // Grid2 verwenden
   Card,
   CardContent,
   CardActions,
@@ -134,7 +134,6 @@ export default function DocumentsPage() {
 
   return (
     <Box>
-      {/* Header */}
       <Box mb={4}>
         <Typography variant="h4" fontWeight="bold" gutterBottom>
           Regulatorische Dokumente
@@ -144,7 +143,6 @@ export default function DocumentsPage() {
         </Typography>
       </Box>
 
-      {/* Search and Filter Bar */}
       <Paper sx={{ p: 2, mb: 3 }}>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
           <TextField
@@ -171,9 +169,8 @@ export default function DocumentsPage() {
         </Stack>
       </Paper>
 
-      {/* Stats Overview */}
       <Grid container spacing={3} mb={3}>
-        <Grid item xs={12} sm={4}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <Paper sx={{ p: 2, textAlign: 'center' }}>
             <CheckCircle color="success" sx={{ fontSize: 40, mb: 1 }} />
             <Typography variant="h6">{selectedDocs.length}</Typography>
@@ -182,7 +179,7 @@ export default function DocumentsPage() {
             </Typography>
           </Paper>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <Paper sx={{ p: 2, textAlign: 'center' }}>
             <Storage color="primary" sx={{ fontSize: 40, mb: 1 }} />
             <Typography variant="h6">9.3 MB</Typography>
@@ -191,7 +188,7 @@ export default function DocumentsPage() {
             </Typography>
           </Paper>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <Paper sx={{ p: 2, textAlign: 'center' }}>
             <Update color="info" sx={{ fontSize: 40, mb: 1 }} />
             <Typography variant="h6">20.03.2024</Typography>
@@ -202,7 +199,6 @@ export default function DocumentsPage() {
         </Grid>
       </Grid>
 
-      {/* Tabs */}
       <Tabs value={selectedTab} onChange={(e, v) => setSelectedTab(v)} sx={{ mb: 3 }}>
         <Tab label="Alle Dokumente" />
         <Tab 
@@ -215,14 +211,13 @@ export default function DocumentsPage() {
         <Tab label="Updates" />
       </Tabs>
 
-      {/* Document Grid */}
       <Grid container spacing={3}>
         {filteredDocs.map(doc => {
           const Icon = doc.icon
           const isSelected = selectedDocs.includes(doc.id)
           
           return (
-            <Grid item xs={12} md={6} lg={4} key={doc.id}>
+            <Grid size={{ xs: 12, md: 6, lg: 4 }} key={doc.id}>
               <Card 
                 sx={{ 
                   height: '100%',
@@ -329,7 +324,6 @@ export default function DocumentsPage() {
         })}
       </Grid>
 
-      {/* Document Details Dialog */}
       <Dialog 
         open={detailsOpen} 
         onClose={() => setDetailsOpen(false)}
@@ -340,7 +334,7 @@ export default function DocumentsPage() {
           <>
             <DialogTitle>
               <Box display="flex" alignItems="center" gap={2}>
-                {React.createElement(selectedDoc.icon, { sx: { fontSize: 32 } })}
+                {<selectedDoc.icon sx={{ fontSize: 32 }} />}
                 <Box>
                   <Typography variant="h6">{selectedDoc.fullName}</Typography>
                   <Typography variant="body2" color="text.secondary">
@@ -352,7 +346,7 @@ export default function DocumentsPage() {
             
             <DialogContent dividers>
               <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Typography variant="subtitle2" gutterBottom>
                     Dokumentinformationen
                   </Typography>
@@ -381,7 +375,7 @@ export default function DocumentsPage() {
                   </List>
                 </Grid>
                 
-                <Grid item xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Typography variant="subtitle2" gutterBottom>
                     Hauptabschnitte
                   </Typography>
@@ -394,7 +388,7 @@ export default function DocumentsPage() {
                   </List>
                 </Grid>
                 
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <Typography variant="subtitle2" gutterBottom>
                     Tags
                   </Typography>

@@ -4,7 +4,7 @@
 import { useState } from 'react'
 import {
   Box,
-  Grid,
+  Grid2 as Grid,  // Grid2 verwenden
   Card,
   CardContent,
   Typography,
@@ -113,7 +113,6 @@ export default function TeamPage() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
   
-  // Form states
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState<'ADMIN' | 'USER'>('USER')
 
@@ -167,7 +166,6 @@ export default function TeamPage() {
 
   return (
     <Box>
-      {/* Header */}
       <Box mb={4}>
         <Typography variant="h4" fontWeight="bold" gutterBottom>
           Team-Verwaltung
@@ -177,9 +175,8 @@ export default function TeamPage() {
         </Typography>
       </Box>
 
-      {/* Organization Overview */}
       <Grid container spacing={3} mb={4}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Paper sx={{ p: 2 }}>
             <Box display="flex" alignItems="center" gap={2}>
               <Groups color="primary" sx={{ fontSize: 40 }} />
@@ -200,7 +197,7 @@ export default function TeamPage() {
           </Paper>
         </Grid>
         
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Paper sx={{ p: 2 }}>
             <Box display="flex" alignItems="center" gap={2}>
               <CheckCircle color="success" sx={{ fontSize: 40 }} />
@@ -216,7 +213,7 @@ export default function TeamPage() {
           </Paper>
         </Grid>
         
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Paper sx={{ p: 2 }}>
             <Box display="flex" alignItems="center" gap={2}>
               <Mail color="warning" sx={{ fontSize: 40 }} />
@@ -232,7 +229,7 @@ export default function TeamPage() {
           </Paper>
         </Grid>
         
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Paper sx={{ p: 2 }}>
             <Box display="flex" alignItems="center" gap={2}>
               <TrendingUp color="info" sx={{ fontSize: 40 }} />
@@ -255,7 +252,6 @@ export default function TeamPage() {
         </Grid>
       </Grid>
 
-      {/* Actions Bar */}
       <Paper sx={{ p: 2, mb: 3 }}>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
           <TextField
@@ -283,7 +279,6 @@ export default function TeamPage() {
         </Stack>
       </Paper>
 
-      {/* Tabs */}
       <Tabs value={selectedTab} onChange={(e, v) => setSelectedTab(v)} sx={{ mb: 3 }}>
         <Tab 
           label={
@@ -302,7 +297,6 @@ export default function TeamPage() {
         <Tab label="Berechtigungen" />
       </Tabs>
 
-      {/* Members Table */}
       {selectedTab === 0 && (
         <TableContainer component={Paper}>
           <Table>
@@ -385,10 +379,9 @@ export default function TeamPage() {
         </TableContainer>
       )}
 
-      {/* Permissions Tab */}
       {selectedTab === 2 && (
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -416,7 +409,7 @@ export default function TeamPage() {
             </Card>
           </Grid>
           
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -448,7 +441,6 @@ export default function TeamPage() {
         </Grid>
       )}
 
-      {/* Member Menu */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -474,7 +466,6 @@ export default function TeamPage() {
         </MenuItem>
       </Menu>
 
-      {/* Invite Dialog */}
       <Dialog open={inviteOpen} onClose={() => setInviteOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Team-Mitglied einladen</DialogTitle>
         <DialogContent>
