@@ -2,11 +2,19 @@
   "name": "ragaiq-web-nextjs",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
+"scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "dev:db": "powershell -ExecutionPolicy Bypass -File scripts/dev.ps1 start",
+    "dev:db:stop": "powershell -ExecutionPolicy Bypass -File scripts/dev.ps1 stop",
+    "dev:db:reset": "powershell -ExecutionPolicy Bypass -File scripts/dev.ps1 reset",
+    "dev:db:logs": "powershell -ExecutionPolicy Bypass -File scripts/dev.ps1 logs",
+    "db:push": "prisma db push",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",

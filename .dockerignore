@@ -118,3 +118,8 @@ storybook-static
 
 # Public folder items (selektiv)
 # public/mockServiceWorker.js
+
+# docker/.gitignore
+postgres-data/
+pgadmin-data/
+*.log
